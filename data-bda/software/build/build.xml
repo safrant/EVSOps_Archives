@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project name="data-bda" default="usage" basedir="." xmlns:bda="antlib:gov.nih.nci.bdalite">
+
+    <description>
+        This is the master build file for the project.
+        It should be placed in project/software/. This script wrappers sub projects to build, test and inspect code.
+        These scripts require Java, Ant and SVN to work.
+    </description>
+
+    <!-- Property file related properties and tasks -->
+    <property environment="env" />
+    <property name="properties.file" value="project.properties" />
+    <property file="${properties.file}" />
+    <echo message="Using project properties file of ${properties.file}." />
+    <available file="${properties.file}" property="properties.file.exists" />
+    <fail unless="properties.file.exists" message="The properties.file ${properties.file} does not exist." />
+
+    <!-- Application standard values -->
+    <property name="project.name" value="data-bda"/>
+    <property name="pack.app.name" value="package.sh" />
+
+    <!-- BDA-Lite Task definitions -->
+    <taskdef uri="antlib:gov.nih.nci.bdalite" resource="gov/nih/nci/bdalite/ant/bda-lite.xml">
+        <classpath>
+            <pathelement location="../common-lib/bda-lite-1.0.0.jar"/>
+        </classpath>
+    </taskdef>
+
+    <!-- BDA-Lite standard locations -->
+    <bda:BDAInit />
+
+    <!-- Application locations -->
+    <property name="common-lib.dir" value="${bda.software.dir}/common-lib" />
+    <!-- :App lib -->
+    <property name="commapp.src.dir" value="${bda.software.dir}/common-conapp/src" />
+    <property name="commapp.build.dir" value="${bda.software.dir}/common-conapp/build" />
+    <property name="commapp.classes.dir" value="${commapp.build.dir}/classes" />
+    <!-- :Package app -->
+    <property name="packapp.src.dir" value="${bda.software.dir}/package-conapp/src" />
+    <property name="packapp.build.dir" value="${bda.software.dir}/package-conapp/build" />
+    <property name="packapp.conf.dir" value="${bda.software.dir}/package-conapp/conf" />
+    <property name="packapp.classes.dir" value="${packapp.build.dir}/classes" />
+    <property name="packapp.app.name"  value="package"/>
+    <property name="packapp.scripts.dir" value="${packapp.src.dir}/scripts" />
+    <!-- :Deploy app -->
+    <property name="depapp.src.dir" value="${bda.software.dir}/deploy-conapp/src" />
+    <property name="depapp.build.dir" value="${bda.software.dir}/deploy-conapp/build" />
+    <property name="depapp.conf.dir" value="${bda.software.dir}/deploy-conapp/conf" />
+    <property name="depapp.classes.dir" value="${depapp.build.dir}/classes" />
+    <property name="depapp.app.name"  value="deploy"/>
+    <property name="depapp.scripts.dir" value="${depapp.src.dir}/scripts" />
+
+    <!-- Distribution properties -->
+    <property name="data-deploy.tar.name" value="data-deploy.tar" />
+    <property name="data-package.tar.name" value="data-package.tar" />
+
+    <!-- Build class path -->
+    <path id="project.compile.classpath">
+        <fileset dir="${common-lib.dir}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+    <property name="runtime.classpath"
+        value="mysql-connector-java-5.1.7-bin.jar xercesImpl.jar log4j.jar bda-lite-1.0.0.jar ant.jar ant-nodeps.jar"
+     />
+
+    <!-- Tar file paths -->
+    <patternset id="common.tar.files">
+        <include name="log4j*.jar"/>
+        <include name="xmysql-connector-java*.jar"/>
+        <include name="xercesImpl*.jar"/>
+        <include name="bda-lite*.jar"/>
+        <include name="ant*.jar"/>
+    </patternset>
+    <patternset id="deploy.tar.files">
+        <include name="deploy.cmd"/>
+        <include name="deploy.jar"/>
+    </patternset>
+    <patternset id="deploy.scripts.tar.files">
+        <include name="deploy.sh"/>
+    </patternset>
+    <patternset id="package.tar.files">
+        <include name="package.cmd"/>
+        <include name="package.jar"/>
+    </patternset>
+    <patternset id="package.scripts.tar.files">
+        <include name="package.sh"/>
+    </patternset>
+
+    <!--============================-->
+    <!-- usage: show build targets  -->
+    <!--============================-->
+
+    <target name="usage" depends="-init" description="Explains how to use this build script">
+        <bda:Usage />
+    </target>
+
+    <target name="clean" depends="-init" description="Remove classes directory for clean build">
+        <delete dir="${bda.target.dir}" quiet="true" />
+        <delete dir="${commapp.build.dir}" quiet="true" />
+        <delete dir="${packapp.build.dir}" quiet="true" />
+        <delete dir="${depapp.build.dir}" quiet="true" />
+    </target>
+
+    <target name="-init" description="Sets up build are and initalizes variables">
+        <tstamp>
+            <format property="BUILD_DATE" pattern="MMMM-d-yyyy hh:mm aa" locale="en,US"/>
+        </tstamp>
+
+        <echo message="Using local properties file of ${local.properties.file}." />
+        <echo message="Using project properties file of ${properties.file}." />
+    </target>
+
+    <!--=========================================-->
+    <!-- build:all: Builds all the sub projects  -->
+    <!--=========================================-->
+
+    <target name="build:all" description="Builds all the project artifacts."
+        depends="
+            clean,
+            -build:package-app,
+            -jar:packapp,
+            -build:deploy-app,
+            -jar:depapp
+        " >
+    </target>
+
+    <target name="-build:common-conapp" depends="-init" description="Call common-conapp sub-projects build target to produce artifiacts">
+
+        <mkdir dir="${commapp.build.dir}" />
+        <mkdir dir="${commapp.classes.dir}" />
+
+        <javac srcdir="${commapp.src.dir}" destdir="${commapp.classes.dir}" debug="true" target="1.6" includeAntRuntime="false">
+            <classpath refid="project.compile.classpath" />
+        </javac>
+        <copy todir="${commapp.classes.dir}" includeEmptyDirs="no">
+            <fileset dir="${commapp.src.dir}/java">
+                <patternset>
+                    <include name="**/*.properties"/>
+                    <include name="**/*.LIB"/>
+                </patternset>
+            </fileset>
+        </copy>
+        <copy todir="${bda.dist.dir}" filtering="false" overwrite="true">
+            <fileset dir="${common-lib.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <target name="-build:package-app" depends="-init,-build:common-conapp" description="Call package sub-projects build target to produce artifiacts">
+
+        <mkdir dir="${packapp.build.dir}" />
+        <mkdir dir="${packapp.classes.dir}" />
+
+        <javac srcdir="${packapp.src.dir}" destdir="${packapp.classes.dir}" debug="true" target="1.6" includeAntRuntime="false">
+            <classpath>
+                <path refid="project.compile.classpath"/>
+                <pathelement path="${commapp.classes.dir}"/>
+                <pathelement path="${packapp.classes.dir}"/>
+            </classpath>
+        </javac>
+        <copy todir="${packapp.classes.dir}" includeEmptyDirs="no">
+            <fileset dir="${packapp.src.dir}/java">
+                <patternset>
+                    <include name="**/*.properties"/>
+                </patternset>
+            </fileset>
+        </copy>
+        <copy todir="${packapp.classes.dir}" includeEmptyDirs="no" filtering="false">
+            <fileset dir="${packapp.conf.dir}">
+                <patternset>
+                    <include name="**/log4j.*"/>
+                </patternset>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <target name="-build:deploy-app" depends="-init,-build:common-conapp" description="Call deploy sub-projects build target to produce artifiacts">
+
+        <mkdir dir="${depapp.build.dir}" />
+        <mkdir dir="${depapp.classes.dir}" />
+
+        <javac srcdir="${depapp.src.dir}" destdir="${depapp.classes.dir}" debug="true" target="1.6" includeAntRuntime="false">
+            <classpath>
+                <path refid="project.compile.classpath"/>
+                <pathelement path="${commapp.classes.dir}"/>
+                <pathelement path="${depapp.classes.dir}"/>
+            </classpath>
+        </javac>
+        <copy todir="${depapp.classes.dir}" includeEmptyDirs="no">
+            <fileset dir="${depapp.src.dir}/java">
+                <patternset>
+                    <include name="**/*.properties"/>
+                </patternset>
+            </fileset>
+        </copy>
+        <copy todir="${depapp.classes.dir}" includeEmptyDirs="no" filtering="false">
+            <fileset dir="${depapp.conf.dir}">
+                <patternset>
+                    <include name="**/log4j.*"/>
+                </patternset>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <target name="deploy:local:upgrade" depends="build:all" description="Upgrades and configures the application on the local machine. Used for developer desktops and ci environments.">
+        <exec dir="${bda.dist.dir}" executable="${pack.app.name}" osfamily="unix">
+            <arg value="-b" />
+        </exec>
+    </target>
+
+    <target name="-jar:packapp" depends="-build:package-app">
+
+        <mkdir dir="${bda.dist.dir}" />
+        <delete file="${bda.dist.dir}/${packapp.app.name}.jar" quiet="true" />
+        <echo message="Packaging files [${bda.dist.dir}]..." />
+
+        <!-- Copy export executables -->
+        <copy todir="${bda.dist.dir}" filtering="true" overwrite="true">
+            <filterset>
+                <filter token="master_lbconfig" value="${master_lbconfig}"/>
+                <filter token="publish_dir" value="${publish_dir}"/>
+                <filter token="ssh.key.file" value="${ssh.key.file}"/>
+            </filterset>
+            <fileset dir="${packapp.scripts.dir}">
+                <include name="*.sh"/>
+                <include name="*.cmd"/>
+            </fileset>
+            <fileset dir="${packapp.conf.dir}">
+                <include name="*.properties"/>
+            </fileset>
+        </copy>
+
+        <!-- Append JBoss server list to deploy.properties file -->
+
+        <concat destfile="${bda.dist.dir}/deploy.properties" append="true">
+            <filelist dir="${packapp.build.dir}" files="jboss.properties"/>
+        </concat>
+
+        <!-- Convert scripts to unix format -->
+        <fixcrlf srcDir="${bda.dist.dir}"
+           eol="lf"
+           eof="remove"
+           includes="${script_list}"
+        />
+
+        <!-- Unix; grant execute permision to shell scripts -->
+        <chmod file="${bda.dist.dir}/*.sh" perm="+x"/>
+
+        <!-- Jar up the whole thing -->
+
+        <jar destfile="${bda.dist.dir}/${packapp.app.name}.jar">
+            <manifest>
+                <attribute name="Built-By" value="NCI"/>
+                <attribute name="Main-Class" value="PackageApp"/>
+                <attribute name="Class-Path" value="${runtime.classpath}"/>
+            </manifest>
+            <fileset dir="${packapp.classes.dir}"/>
+            <fileset dir="${commapp.classes.dir}"/>
+        </jar>
+
+    </target>
+
+    <target name="-jar:depapp" depends="-build:deploy-app">
+
+        <mkdir dir="${bda.dist.dir}" />
+        <delete file="${bda.dist.dir}/${depapp.app.name}.jar" quiet="true" />
+        <echo message="Packaging files [${bda.dist.dir}]..." />
+
+        <!-- Copy export executables -->
+        <copy todir="${bda.dist.dir}" filtering="true" overwrite="true">
+            <filterset>
+                <filter token="target_lbconfig" value="${target_lbconfig}"/>
+                <filter token="publish_dir" value="${publish_dir}"/>
+                <filter token="backup_dir" value="${backup_dir}"/>
+                <filter token="ssh.key.file" value="${ssh.key.file}"/>
+            </filterset>
+            <fileset dir="${depapp.scripts.dir}">
+                <include name="*.sh"/>
+                <include name="*.cmd"/>
+            </fileset>
+            <fileset dir="${depapp.conf.dir}">
+                <include name="*.properties"/>
+            </fileset>
+        </copy>
+
+        <!-- Append JBoss server list to deploy.properties file -->
+
+        <concat destfile="${bda.dist.dir}/deploy.properties" append="true">
+            <filelist dir="${depapp.build.dir}" files="jboss.properties"/>
+        </concat>
+
+        <!-- Convert scripts to unix format -->
+        <fixcrlf srcDir="${bda.dist.dir}"
+           eol="lf"
+           eof="remove"
+           includes="${script_list}"
+        />
+
+        <!-- Unix; grant execute permision to shell scripts -->
+        <chmod file="${bda.dist.dir}/*.sh" perm="+x"/>
+
+        <!-- Jar up the whole thing -->
+
+        <jar destfile="${bda.dist.dir}/${depapp.app.name}.jar">
+            <manifest>
+                <attribute name="Built-By" value="NCI"/>
+                <attribute name="Main-Class" value="DeployApp"/>
+                <attribute name="Class-Path" value="${runtime.classpath}"/>
+            </manifest>
+            <fileset dir="${depapp.classes.dir}"/>
+            <fileset dir="${commapp.classes.dir}"/>
+        </jar>
+
+    </target>
+
+    <target name="tar" depends="-init,build:all" description="Tar executables for distribution">
+        <echo message="Building distribution tar file..."/>
+        <delete file="${bda.dist.dir}/${data-package.tar.name}" quiet="true" />
+        <delete file="${bda.dist.dir}/${data-deploy.tar.name}" quiet="true" />
+
+        <tar destfile="${bda.dist.dir}/${data-package.tar.name}">
+            <tarfileset preserveLeadingSlashes="true" dir="${bda.dist.dir}">
+              <patternset refid="common.tar.files"/>
+            </tarfileset>
+            <tarfileset preserveLeadingSlashes="true" dir="${bda.dist.dir}">
+              <patternset refid="package.tar.files"/>
+            </tarfileset>
+            <tarfileset preserveLeadingSlashes="true" dir="${bda.dist.dir}" filemode="755">
+              <patternset refid="package.scripts.tar.files"/>
+            </tarfileset>
+        </tar>
+
+        <tar destfile="${bda.dist.dir}/${data-deploy.tar.name}">
+            <tarfileset preserveLeadingSlashes="true" dir="${bda.dist.dir}">
+              <patternset refid="common.tar.files"/>
+            </tarfileset>
+            <tarfileset preserveLeadingSlashes="true" dir="${bda.dist.dir">
+              <patternset refid="deploy.tar.files"/>
+            </tarfileset>
+            <tarfileset preserveLeadingSlashes="true" dir="${bda.dist.dir}" filemode="755">
+              <patternset refid="deploy.scripts.tar.files"/>
+            </tarfileset>
+        </tar>
+
+    </target>
+
+</project>

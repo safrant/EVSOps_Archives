@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="software/common-conapp/src/java"/>
+	<classpathentry kind="src" path="software/deploy-conapp/src/java"/>
+	<classpathentry kind="src" path="software/package-conapp/src/java"/>
+	<classpathentry kind="lib" path="software/common-lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="software/common-lib/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="software/common-lib/log4j.jar"/>
+	<classpathentry kind="lib" path="software/common-lib/bda-lite-1.0.0.jar" sourcepath="/bda-lite/software/bda-lite/src/java"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/bda-lite"/>
+	<classpathentry kind="output" path="software/target"/>
+</classpath>

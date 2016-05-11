@@ -1,0 +1,58 @@
+#!/bin/bash
+# ******************************************
+# **** Command file to invoke build.xml ****
+# ******************************************
+# Environment settings here...
+DEBUG=-Denable.install.debug=false
+TAG=-Danthill.build.tag_built=$USER
+clear
+
+if [ "$2" = "debug" ]; then
+   DEBUG="$DEBUG -debug"
+fi
+
+if [ -n "${JAVA_HOME+x}" ]; then
+    echo JAVA_HOME is $JAVA_HOME
+else
+    echo JAVA_HOME is not set
+    exit
+fi
+
+if [ -n "${ANT_HOME+x}" ]; then
+    echo ANT_HOME is $ANT_HOME
+else
+    echo ANT_HOME is not set
+    exit
+fi
+
+if [ -z "$1" ]; then
+    echo
+    echo "Available targets are:"
+    echo
+    echo "  clean        -- Remove classes directory for clean build"
+    echo "  all          -- Normal build of application"
+    echo "  upgrade      -- Normal build of application with local deployment"
+    echo "  tar          -- Tar executables for distribution"
+    echo
+    exit
+fi
+
+case $1 in
+    all)
+        ant build:all
+        ;;
+
+    upgrade)
+        ant deploy:local:upgrade
+        ;;
+
+    clean)
+        ant clean
+        ;;
+    tar)
+        ant tar
+        ;;
+    *)
+        echo "Invalid target '$1'."
+        ;;
+esac
