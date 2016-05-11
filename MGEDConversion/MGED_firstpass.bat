@@ -1,0 +1,1 @@
+perl mged_firstpass.pl MGED-Ontology_1.3.1-Inferred-input.owl > firstpass.txt

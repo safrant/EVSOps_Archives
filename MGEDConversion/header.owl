@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:p1="http://protege.stanford.edu/plugins/owl/dc/protege-dc.owl#"
+    xmlns:xsp="http://www.owl-ontologies.com/2005/08/07/xsp.owl#"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:protege="http://protege.stanford.edu/plugins/owl/protege#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:daml="http://www.daml.org/2001/03/daml+oil#"
+    xmlns:p2="http://www.owl-ontologies.com/assert.owl#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns="http://mged.sourceforge.net/ontologies/MGEDOntology.owl#"
+  xml:base="http://mged.sourceforge.net/ontologies/MGEDOntology.owl">
+  <owl:Ontology rdf:about="">
+    <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >February 9, 2007</dc:date>
+    <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Chris Stoeckert, Helen Parkinson, Trish Whetzel, Paul Spellman, Catherine A. Ball, Joseph White, John Matese, Liju Fan, Gilberto Fragoso, Mervi Heiskanen, Susanna Sansone, Helen Causton, Laurence Game, Chris Taylor</dc:creator>
+    <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The MGED Ontology</dc:title>
+    <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Concepts, definitions, terms, and resources for standardized description of a microarray experiment in support of MAGE v.1. The MGED ontology is divided into the MGED Core ontology which is intended to be stable and in synch with MAGE v.1; and the MGED Extended ontology which adds further associations and classes not found in MAGE v.1</dc:description>
+    <owl:imports rdf:resource="http://protege.stanford.edu/plugins/owl/protege"/>
+    <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >classified</owl:versionInfo>
+    <dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >An ontology for microarray experiments in support of MAGE v.1.</dc:subject>
+    <owl:imports rdf:resource="http://purl.org/dc/elements/1.1/"/>
+    <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >1.3.1.1</owl:versionInfo>
+  </owl:Ontology>
+
+<owl:DatatypeProperty rdf:ID="DEFINITION">
+<rdfs:label>DEFINITION</rdfs:label>
+<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="Preferred_Name">
+<rdfs:label>Preferred_Name</rdfs:label>
+<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+
+

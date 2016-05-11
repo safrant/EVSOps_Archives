@@ -1,0 +1,1 @@
+perl mged_secondpass.pl firstpass.txt map.txt header.owl > SecondPass.owl
