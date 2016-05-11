@@ -1,0 +1,67 @@
+<project name="HGNCtoOWL" basedir=".">
+    <!-- *********************************************************-->
+    <!--    Properties                                            -->
+    <!-- *********************************************************-->
+
+    <property name="lib.dir" value="./lib"/>
+    <property name="build.dir" value="./build" />
+    <property name="classes.dir" value="./classes" />
+    <property name="src.dir" value="./src" />
+    <property name="output.dir" value="./output"/>
+    <property name="hgnctoowl.properties" value = "./config/HGNCtoOWL.properties" />
+    
+    
+    <path id="libs">
+        <pathelement location="${classes.dir}"/>
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    
+    <!-- ********************************************************-->
+    <!--    Targets for building                                 -->
+    <!-- ********************************************************-->
+    
+    <target name="clean"
+        description="Removes generated artifacts">
+        <delete dir="${build.dir}" quiet="true"/>
+        <delete file="${outputFile}" quiet="true"/>
+    </target>
+    
+    <target name="init" depends="clean" 
+            description="Creates necessary directories">
+           <mkdir dir="${classes.dir}"/>
+            <mkdir dir="${build.dir}"/>
+     </target>
+    
+    <target name="compile" depends="init" description="Compiles">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" 
+            encoding="cp1252" debug="true" debuglevel="lines,source">
+            <classpath refid="libs"/>
+        </javac>        
+    </target>
+    
+    <!-- ********************************************************-->
+    <!--    Targets for packaging                                 -->
+    <!-- ********************************************************-->
+    <target name="jar" depends="compile" description="Package code into a jar file">
+         <jar destfile= "${build.dir}/HGNCtoOWL.jar"
+                basedir="${classes.dir}">
+         </jar>
+    </target>
+    
+    <!-- *****************************************************-->
+    <!--    Targets for running                               -->
+    <!-- *****************************************************-->
+
+    <target name="run" depends="jar" description="Runs default">
+        <echo message="Command line args: ${arguments}" />
+        <java classname="gov.nih.nci.evs.hgnc.HGNCtoOWL" fork="true">
+            <jvmarg value="-Xmx1000m" />
+            <!--arg line="${arguments}"/-->
+            <classpath refid="libs"/>
+            <sysproperty key="hgnctoowl.properties" value="${hgnctoowl.properties}" />
+        </java>
+    </target>
+</project>

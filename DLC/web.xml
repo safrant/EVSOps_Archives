@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+	<description>ncicbdl</description>
+	<context-param>
+		<param-name>dbURL</param-name>
+		<param-value>@dbURL@</param-value>
+	</context-param>
+	<context-param>
+		<param-name>dbUser</param-name>
+		<param-value>@dbUser@</param-value>
+	</context-param>
+	<context-param>
+		<param-name>dbPassword</param-name>
+		<param-value>@dbPassword@</param-value>
+	</context-param>
+	<servlet>
+		<servlet-name>invoker</servlet-name>
+		<servlet-class>
+          org.apache.catalina.servlets.InvokerServlet
+        </servlet-class>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>0</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>invoker</servlet-name>
+		<url-pattern>/servlet/*</url-pattern>
+	</servlet-mapping>
+	<!--  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>Admin</realm-name>
+  </login-config>             -->
+	<!-- If you want to experiment with form-based logins, comment
+       out the <login-config> element above and replace it with
+       this one.  Note that we are currently using a nonstandard
+       authentication method, because the code to support form
+       based login is incomplete and only lightly tested.  -->
+	<!--
+  <servlet>
+        <servlet-name>authenticate</servlet-name>
+        <servlet-class>gov.nih.nci.ncicbdl.AuthenticateServlet</servlet-class>
+    <init-param>
+      <param-name>dbURL</param-name>
+      <param-value>@dbURL@</param-value>
+    </init-param> 
+    <init-param>
+      <param-name>dbUser</param-name>
+      <param-value>@dbUser@</param-value>
+    </init-param> 
+    <init-param>
+      <param-name>dbPassword</param-name>
+      <param-value>@dbPassword@</param-value>
+    </init-param> 
+  </servlet>
+
+    <servlet>
+        <servlet-name>listserv</servlet-name>
+        <servlet-class>ncicbdl.Listserv</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+        <servlet-name>authenticate</servlet-name>
+        <url-pattern>/ncicbdl/servlet/ncicbdl.AuthenticateServlet</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+        <servlet-name>listserv</servlet-name>
+        <url-pattern>/servlet/ncicbdl.Listserv</url-pattern>
+   </servlet-mapping>
+
+    <taglib>
+  <taglib-uri>/ncicbdl</taglib-uri>
+  <taglib-location>/WEB-INF/tld/taglib.tld</taglib-location>
+ </taglib>       
+-->
+	<taglib>
+		<taglib-uri>/WEB-INF/taglib.tld</taglib-uri>
+		<taglib-location>/WEB-INF/tld/taglib.tld</taglib-location>
+	</taglib>
+
+<env-entry>
+	 <env-entry-name>UMLSFtp</env-entry-name>
+	 <env-entry-value>ftp://evsftp:ev$ftp@caftpu.nci.nih.gov/current/Metathesaurus_201004D.RRF.zip;type=i</env-entry-value>
+	 <env-entry-type>java.lang.String</env-entry-type>
+</env-entry>
+<servlet>
+    <servlet-name>UMLSServlet</servlet-name>
+    <servlet-class>gov.nih.nci.ncicbdl.UMLSServlet</servlet-class>
+  </servlet>
+
+</web-app>
+
